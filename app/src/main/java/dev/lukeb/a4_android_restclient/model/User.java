@@ -32,6 +32,10 @@ public class User implements Parcelable {
     @Expose
     String website;
 
+    @SerializedName("address")
+    @Expose
+    Address address;
+
 
     public User(String name, String username, String email, int id, String phone, String website){
         this.name = name;
@@ -49,6 +53,23 @@ public class User implements Parcelable {
         id = in.readInt();
         phone = in.readString();
         website = in.readString();
+        address = in.readParcelable(Address.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(username);
+        dest.writeString(email);
+        dest.writeInt(id);
+        dest.writeString(phone);
+        dest.writeString(website);
+        dest.writeParcelable(address, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -62,6 +83,10 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public Address getAddress() { return address; }
+
+    public void setAddress(Address address) { this.address = address; }
 
     public String getPhone() { return phone; }
 
@@ -99,18 +124,4 @@ public class User implements Parcelable {
         this.email = email;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(name);
-        parcel.writeString(username);
-        parcel.writeString(email);
-        parcel.writeInt(id);
-        parcel.writeString(phone);
-        parcel.writeString(website);
-    }
 }

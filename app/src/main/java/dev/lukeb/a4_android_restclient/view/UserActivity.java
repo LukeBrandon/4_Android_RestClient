@@ -9,35 +9,37 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 import dev.lukeb.a4_android_restclient.R;
-import dev.lukeb.a4_android_restclient.api.ApiService;
-import dev.lukeb.a4_android_restclient.api.RetrofitClient;
 import dev.lukeb.a4_android_restclient.model.BlogPost;
 import dev.lukeb.a4_android_restclient.model.User;
 import dev.lukeb.a4_android_restclient.presenter.UserPresenter;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "UserActivity";
 
-    UserPresenter presenter;
+    private UserPresenter presenter;
 
-    User user;
+    private User user;
+    private List<BlogPost> blogPosts;
+    private GoogleMap mMap;
+    private LatLng location;
 
-    TextView userNameTextView;
-    TextView realNameTextView;
-    TextView emailTextView;
-    TextView phoneTextView;
-    TextView websiteTextView;
+    private RecyclerView recyclerView;
+    private PostAdapter adapter;
 
-
-    PostAdapter adapter;
-    RecyclerView recyclerView;
-    List<BlogPost> blogPosts;
+    private TextView userNameTextView;
+    private TextView realNameTextView;
+    private TextView emailTextView;
+    private TextView phoneTextView;
+    private TextView websiteTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,24 +54,46 @@ public class UserActivity extends AppCompatActivity {
         this.phoneTextView = findViewById(R.id.phoneNumber);
         this.websiteTextView = findViewById(R.id.website);
 
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.userMap);
+        mapFragment.getMapAsync(this);
+
         initializeRecyclerView();
+    }
 
+     // Callback for when the map is ready
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Once the map is ready, get the data off of the intent, need to wait for map ready
+        //    because we need the location of the user to move the map there
         getDataFromIntent();
-        presenter.getBlogPostsForUser(user);
 
+        mMap.setMinZoomPreference(15);
+        mMap.setMaxZoomPreference(30);
     }
 
     private void getDataFromIntent(){
         Intent intent = getIntent();
         this.user = intent.getParcelableExtra(PostActivity.USER_INTENT_TAG);
 
-        Log.d(TAG, "getDataFromIntent: Got user inside of UserActivity as: " + this.user);
+        // Once gets the user, ask the presenter for the data
+        presenter.getBlogPostsForUser(user);
 
+        // Update the UI elements
         this.realNameTextView.setText(user.getName());
         this.userNameTextView.setText("Username:  " + user.getUsername());
         this.emailTextView.setText("Email:  "+ user.getEmail());
         this.phoneTextView.setText("Phone:  "+ user.getPhone());
         this.websiteTextView.setText("Website:  " + user.getWebsite());
+
+        this.location = new LatLng(Double.parseDouble(user.getAddress().getGeo().getLat()),Double.parseDouble(user.getAddress().getGeo().getLng()));
+
+        // Moves map to the location that was gotten
+        this.mMap.moveCamera(CameraUpdateFactory.newLatLng(this.location));
+        Log.d(TAG, "getDataFromIntent: moving camera to " + this.location.toString());
     }
 
     private void initializeRecyclerView() {
@@ -88,6 +112,7 @@ public class UserActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+
         recyclerView.setAdapter(adapter);
 
         this.adapter.notifyDataSetChanged();
