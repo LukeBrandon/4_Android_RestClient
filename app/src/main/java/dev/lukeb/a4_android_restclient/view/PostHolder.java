@@ -55,7 +55,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 User userResponse = response.body();
-                updateUserData(userResponse.getName());
+                updateUserData(userResponse.getUsername());
             }
 
             @Override
