@@ -14,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
@@ -71,8 +72,10 @@ public class UserActivity extends AppCompatActivity implements OnMapReadyCallbac
         //    because we need the location of the user to move the map there
         getDataFromIntent();
 
-        mMap.setMinZoomPreference(15);
+        mMap.setMinZoomPreference(2);
         mMap.setMaxZoomPreference(30);
+        mMap.addMarker(new MarkerOptions().position(this.location));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.location, 3));
     }
 
     private void getDataFromIntent(){
@@ -91,9 +94,6 @@ public class UserActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         this.location = new LatLng(Double.parseDouble(user.getAddress().getGeo().getLat()),Double.parseDouble(user.getAddress().getGeo().getLng()));
 
-        // Moves map to the location that was gotten
-        this.mMap.moveCamera(CameraUpdateFactory.newLatLng(this.location));
-        Log.d(TAG, "getDataFromIntent: moving camera to " + this.location.toString());
     }
 
     private void initializeRecyclerView() {

@@ -10,11 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.List;
 
 import dev.lukeb.a4_android_restclient.R;
@@ -79,7 +78,7 @@ public class PostActivity extends AppCompatActivity {
         Comment resultFromActivity = data.getParcelableExtra(CreateCommentActivity.COMMENT_INTENT_TAG);
 
         this.presenter.postComment(resultFromActivity);
-        this.comments.add(resultFromActivity);
+        this.comments.add(0, resultFromActivity);
         this.adapter.notifyDataSetChanged();
     }
 
