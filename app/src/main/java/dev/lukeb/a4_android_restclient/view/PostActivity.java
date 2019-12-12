@@ -75,11 +75,13 @@ public class PostActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Comment resultFromActivity = data.getParcelableExtra(CreateCommentActivity.COMMENT_INTENT_TAG);
+        if (resultCode == RESULT_OK) {
+            Comment resultFromActivity = data.getParcelableExtra(CreateCommentActivity.COMMENT_INTENT_TAG);
 
-        this.presenter.postComment(resultFromActivity);
-        this.comments.add(0, resultFromActivity);
-        this.adapter.notifyDataSetChanged();
+            this.presenter.postComment(resultFromActivity);
+            this.comments.add(0, resultFromActivity);
+            this.adapter.notifyDataSetChanged();
+        }
     }
 
     private void getDataFromIntent(){
